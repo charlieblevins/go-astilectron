@@ -11,8 +11,8 @@ import (
 	"time"
 
 	"github.com/asticode/go-astilog"
-	"github.com/asticode/go-astitools/context"
-	"github.com/asticode/go-astitools/exec"
+	asticontext "github.com/asticode/go-astitools/context"
+	astiexec "github.com/asticode/go-astitools/exec"
 	"github.com/pkg/errors"
 )
 
@@ -34,14 +34,16 @@ var (
 
 // App event names
 const (
-	EventNameAppClose         = "app.close"
-	EventNameAppCmdQuit       = "app.cmd.quit" // Sends an event to Electron to properly quit the app
-	EventNameAppCmdStop       = "app.cmd.stop" // Cancel the context which results in exiting abruptly Electron's app
-	EventNameAppCrash         = "app.crash"
-	EventNameAppErrorAccept   = "app.error.accept"
-	EventNameAppEventReady    = "app.event.ready"
-	EventNameAppNoAccept      = "app.no.accept"
-	EventNameAppTooManyAccept = "app.too.many.accept"
+	EventNameAppClose                   = "app.close"
+	EventNameAppCmdQuit                 = "app.cmd.quit" // Sends an event to Electron to properly quit the app
+	EventNameAppCmdStop                 = "app.cmd.stop" // Cancel the context which results in exiting abruptly Electron's app
+	EventNameProtocolCmdRegisterApp     = "protocol.cmd.register.app"
+	EventNameProtocolRegisterCompletion = "protocol.event.register.completion"
+	EventNameAppCrash                   = "app.crash"
+	EventNameAppErrorAccept             = "app.error.accept"
+	EventNameAppEventReady              = "app.event.ready"
+	EventNameAppNoAccept                = "app.no.accept"
+	EventNameAppTooManyAccept           = "app.too.many.accept"
 )
 
 // Astilectron represents an object capable of interacting with Astilectron
@@ -279,6 +281,23 @@ func (a *Astilectron) execute() (err error) {
 	if err = a.executeCmd(cmd); err != nil {
 		return errors.Wrap(err, "executing cmd failed")
 	}
+
+	// register app:// protocol
+	workingdir, err := os.Getwd()
+	if err != nil {
+		return errors.Wrap(err, "Failed to get current working directory")
+	}
+
+	synchronousEvent(
+		a.canceller,
+		a,
+		a.writer,
+		Event{
+			Name:     EventNameProtocolCmdRegisterApp,
+			FilePath: workingdir + "/resources/app",
+		},
+		EventNameProtocolRegisterCompletion,
+	)
 	return
 }
 
