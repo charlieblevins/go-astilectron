@@ -27,6 +27,7 @@ type Event struct {
 	CallbackID          string               `json:"callbackId,omitempty"`
 	Displays            *EventDisplays       `json:"displays,omitempty"`
 	FilePath            string               `json:"filePath,omitempty"`
+	PathName            string               `json:"pathName,omitempty"`
 	ID                  *int                 `json:"id,omitempty"`
 	Image               string               `json:"image,omitempty"`
 	Index               *int                 `json:"index,omitempty"`

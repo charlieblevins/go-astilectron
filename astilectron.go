@@ -37,6 +37,8 @@ const (
 	EventNameAppClose                   = "app.close"
 	EventNameAppCmdQuit                 = "app.cmd.quit" // Sends an event to Electron to properly quit the app
 	EventNameAppCmdStop                 = "app.cmd.stop" // Cancel the context which results in exiting abruptly Electron's app
+	EventNameAppCmdGetPath              = "app.cmd.get.path"
+	EventNameAppEventGetPathResult      = "app.event.get.path.result"
 	EventNameProtocolCmdRegisterApp     = "protocol.cmd.register.app"
 	EventNameProtocolRegisterCompletion = "protocol.event.register.completion"
 	EventNameAppCrash                   = "app.crash"
@@ -442,4 +444,26 @@ func (a *Astilectron) NewTray(o *TrayOptions) *Tray {
 // NewNotification creates a new notification
 func (a *Astilectron) NewNotification(o *NotificationOptions) *Notification {
 	return newNotification(o, a.supported != nil && a.supported.Notification != nil && *a.supported.Notification, a.canceller, a.dispatcher, a.identifier, a.writer)
+}
+
+// GetPath gets one of the electron special paths by name - https://github.com/electron/electron/blob/master/docs/api/app.md#appgetpathname
+func (a *Astilectron) GetPath(name string) (string, error) {
+
+	//EventNameAppCmdGetPath              = "app.cmd.get.path"
+	//EventNameAppEventGetPathResult      = "app.event.get.path.result"
+
+	evt, err := synchronousEvent(
+		a.canceller,
+		a,
+		a.writer,
+		Event{
+			Name:     EventNameAppCmdGetPath,
+			PathName: name,
+		},
+		EventNameAppEventGetPathResult,
+	)
+	if err != nil {
+		return "", errors.Wrap(err, "Failed to get current working directory")
+	}
+	return evt.PathName, nil
 }
