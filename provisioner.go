@@ -240,6 +240,15 @@ func (p *defaultProvisioner) provisionElectronFinishDarwinCopy(paths Paths) (err
 			return errors.Wrapf(err, "copying %s to %s failed", src, dst)
 		}
 	}
+
+	// Electron process Info.plist
+	src, dst = paths.InnerInfoPlist(), filepath.Join(paths.ElectronDirectory(), "Electron.app", "Contents", "Info.plist")
+	if src != "" {
+		astilog.Debugf("Copying %s to %s", src, dst)
+		if err = astios.Copy(context.Background(), src, dst); err != nil {
+			return errors.Wrapf(err, "copying %s to %s failed", src, dst)
+		}
+	}
 	return
 }
 

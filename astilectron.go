@@ -75,6 +75,7 @@ type Options struct {
 	AppName            string
 	AppIconDarwinPath  string // Darwin systems requires a specific .icns file
 	AppIconDefaultPath string
+	InnerInfoPlistPath string
 	BaseDirectoryPath  string
 	DataDirectoryPath  string
 	ElectronSwitches   []string
@@ -285,18 +286,13 @@ func (a *Astilectron) execute() (err error) {
 	}
 
 	// register app:// protocol
-	workingdir, err := os.Getwd()
-	if err != nil {
-		return errors.Wrap(err, "Failed to get current working directory")
-	}
-
 	synchronousEvent(
 		a.canceller,
 		a,
 		a.writer,
 		Event{
 			Name:     EventNameProtocolCmdRegisterApp,
-			FilePath: workingdir + "/resources/app",
+			FilePath: a.Paths().DataDirectory() + "/resources/app/",
 		},
 		EventNameProtocolRegisterCompletion,
 	)

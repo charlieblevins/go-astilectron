@@ -14,6 +14,7 @@ type Paths struct {
 	appExecutable          string
 	appIconDarwinSrc       string
 	appIconDefaultSrc      string
+	innerInfoPlist		   string
 	astilectronApplication string
 	astilectronDirectory   string
 	astilectronDownloadSrc string
@@ -53,6 +54,10 @@ func newPaths(os, arch string, o Options) (p *Paths, err error) {
 	p.appIconDefaultSrc = o.AppIconDefaultPath
 	if len(p.appIconDefaultSrc) > 0 && !filepath.IsAbs(p.appIconDefaultSrc) {
 		p.appIconDefaultSrc = filepath.Join(p.dataDirectory, p.appIconDefaultSrc)
+	}
+	p.innerInfoPlist = o.InnerInfoPlistPath
+	if len(p.innerInfoPlist) > 0 && !filepath.IsAbs(p.innerInfoPlist) {
+		p.innerInfoPlist = filepath.Join(p.dataDirectory, p.innerInfoPlist)
 	}
 	p.vendorDirectory = filepath.Join(p.dataDirectory, "vendor")
 	p.provisionStatus = filepath.Join(p.vendorDirectory, "status.json")
@@ -238,4 +243,8 @@ func (p Paths) ProvisionStatus() string {
 // VendorDirectory returns the vendor directory path
 func (p Paths) VendorDirectory() string {
 	return p.vendorDirectory
+}
+
+func (p Paths) InnerInfoPlist() string {
+	return p.innerInfoPlist
 }
